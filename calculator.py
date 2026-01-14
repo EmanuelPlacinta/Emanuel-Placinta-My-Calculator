@@ -34,9 +34,47 @@ window.resizable(False, False)
 #affichage dans la page
 frame = tkinter.Frame(window)#integrer la frame dans window
 label = tkinter.Label(frame, text="0", font=("Arial", 45), background=color_2,
-                      foreground=color_5, anchor="e", width=column_count)
+                      foreground=color_5, anchor="e", width=column_count + 1)
 
 label.grid(row=0, column=0, columnspan=column_count, sticky="we")
+
+#Prio des signes
+def calculate_expression(expression):
+    #enlever l erreur quand on utilise des num negatifs
+    if expression.startswith('-'):
+        expression = "0" + expression
+
+    # separer les num et symbols
+    for symbol in "+-×÷":
+        expression = expression.replace(symbol, f" {symbol} ") # Ajout des espaces pour split
+    elements = expression.split()
+
+    # mettre la prio sur la div et la multiplication
+    i = 0
+    while i < len(elements):
+        if elements[i] in ["×", "÷"]:
+            num1 = float(elements[i-1])
+            num2 = float(elements[i+1])
+            if elements[i] == "×" :
+                res = num1 * num2
+            else:
+                if num2 == 0: return "ERROR"
+                res = num1 / num2
+            elements[i-1:i+2] = [res] 
+            i -= 1 
+        i += 1 # Passage au suivant
+
+    #addition et soustraction
+    total = float(elements[0])
+    i = 1
+    while i < len(elements):
+        op = elements[i]
+        num2 = float(elements[i+1])
+        if op == "+": total += num2
+        if op == "-": total -= num2
+        i += 2
+    return total
+
 
 for row in range(row_count):
     for column in range(column_count):
@@ -67,8 +105,9 @@ def clear_all():
     B = None
 
 def remove_zero(num):
-    if num % 1 == 0 :
-        num = int(num)
+    if num == "ERROR": return "ERROR"
+    if float(num) % 1 == 0 :
+        num = int(float(num))
     return str(num)
 
 
@@ -78,35 +117,28 @@ def button_clicked(value):
     if value in bottom_symbols:
         if value == "√":
             result = float(label["text"]) ** 0.5
+            result = round(result, 4)
             label["text"] = remove_zero(result)
 
 
     if value in right_symbols:
         if value == "=":
-            if A is not None and operator is not None:
-                B = label["text"]
-                numA = float(A)
-                numB = float(B)
-
-                if operator == "+":
-                    label["text"] = remove_zero(numA + numB)
-                elif operator == "-":
-                    label["text"] = remove_zero(numA - numB)
-                elif operator == "×":
-                    label["text"] = remove_zero(numA * numB)
-                elif operator == "÷":
-                    label["text"] = remove_zero(numA / numB)
-
-                clear_all
-
+            try:
+                final_result = calculate_expression(label["text"])
+                label["text"] = remove_zero(final_result)
+                clear_all()
+            except:
+                label["text"] = "ERROR"
+                clear_all()
 
         elif value in "+-×÷":
-            if operator is None:
-                A = label["text"]
+            if label["text"] == "ERROR":
                 label["text"] = "0"
-                B = "0"
 
-            operator = value
+            if label["text"][-1] in "+-×÷":
+                label["text"] = label["text"][:-1] + value
+            else:
+                label["text"] += value
 
     elif value in top_symbols:
         if value == "AC":
@@ -122,10 +154,12 @@ def button_clicked(value):
             label["text"] = remove_zero(result)
     else:
         if value == ".":
-            if value not in label["text"]:
+            # On split pour vérifier le point sur le dernier nombre tapé
+            last_part = label["text"].replace("+"," ").replace("-"," ").replace("×"," ").replace("÷"," ").split()[-1]
+            if "." not in last_part:
                 label["text"] += value
         elif value in "0123456789":
-            if label["text"] == "0":
+            if label["text"] == "0" or label["text"] == "ERROR":
                 label["text"] = value #remplace le 0
             else:
                 label["text"] += value #ajoute chiffre
@@ -144,4 +178,3 @@ window_y = int((screen_height/2) - (window_height/2))
 window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
 
 window.mainloop()
-
