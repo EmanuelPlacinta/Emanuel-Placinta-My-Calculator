@@ -12,6 +12,8 @@ button_values = [
 #position des bouttons
 right_symbols = ["÷", "×", "-", "+", "="]
 top_symbols = ["AC", "+/-", "%"]
+bottom_symbols = ["√"]
+
 
 #nombre rangs et colonnes
 row_count = len(button_values) #5
@@ -73,6 +75,11 @@ def remove_zero(num):
 def button_clicked(value):
     global right_symbols, top_symbols, label, A, B, operator
 
+    if value in bottom_symbols:
+        if value == "√":
+            result = float(label["text"]) ** 0.5
+            label["text"] = remove_zero(result)
+
 
     if value in right_symbols:
         if value == "=":
@@ -88,7 +95,7 @@ def button_clicked(value):
                 elif operator == "×":
                     label["text"] = remove_zero(numA * numB)
                 elif operator == "÷":
-                    label["text"] = remove_zero(numA * numB)
+                    label["text"] = remove_zero(numA / numB)
 
                 clear_all
 
