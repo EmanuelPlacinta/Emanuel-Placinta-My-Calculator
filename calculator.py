@@ -73,6 +73,7 @@ def calculate_expression(expression):
         if op == "+": total += num2
         if op == "-": total -= num2
         i += 2
+        total = (total, 10)
     return total
 
 
@@ -106,8 +107,9 @@ def clear_all():
 
 def remove_zero(num):
     if num == "ERROR": return "ERROR"
+    num = round(float(num),10)
     if float(num) % 1 == 0 :
-        num = int(float(num))
+        num = int(num)
     return str(num)
 
 
