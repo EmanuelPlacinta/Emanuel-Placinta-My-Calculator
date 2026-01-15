@@ -40,14 +40,21 @@ label.grid(row=0, column=0, columnspan=column_count, sticky="we")
 
 #Prio des signes
 def calculate_expression(expression):
-    #enlever l erreur quand on utilise des num negatifs
-    if expression.startswith('-'):
-        expression = "0" + expression
-
-    # separer les num et symbols
-    for symbol in "+-×÷":
-        expression = expression.replace(symbol, f" {symbol} ") # Ajout des espaces pour split
-    elements = expression.split()
+    # Séparer les num et symbols en protégeant les nombres négatifs
+    temp_expr = ""
+    for i, char in enumerate(expression):
+        if char in "+×÷":
+            temp_expr += f" {char} "
+        elif char == "-":
+            # Si le moins est au début ou après un autre opérateur, c'est un nombre négatif
+            if i == 0 or expression[i-1] in "+-×÷":
+                temp_expr += char
+            else:
+                temp_expr += " - "
+        else:
+            temp_expr += char
+            
+    elements = temp_expr.split()
 
     # mettre la prio sur la div et la multiplication
     i = 0
@@ -65,16 +72,18 @@ def calculate_expression(expression):
         i += 1 # Passage au suivant
 
     #addition et soustraction
-    total = float(elements[0])
-    i = 1
-    while i < len(elements):
-        op = elements[i]
-        num2 = float(elements[i+1])
-        if op == "+": total += num2
-        if op == "-": total -= num2
-        i += 2
-        total = (total, 10)
-    return total
+    try:
+        total = float(elements[0])
+        i = 1
+        while i < len(elements):
+            op = elements[i]
+            num2 = float(elements[i+1])
+            if op == "+": total += num2
+            if op == "-": total -= num2
+            i += 2
+        return round(total, 10) # Arrondi pour corriger les erreurs de virgule flottante
+    except:
+        return "ERROR"
 
 
 for row in range(row_count):
@@ -94,10 +103,7 @@ for row in range(row_count):
         button.grid(row=row+1, column=column)
 frame.pack()
 
-#Variables globales
-A = "0"
-operator = None
-B = None
+
 
 def clear_all():
     global A, B, operator
