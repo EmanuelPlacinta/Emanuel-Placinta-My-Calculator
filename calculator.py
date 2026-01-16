@@ -3,10 +3,11 @@ import tkinter
 #setup calculatrice
 button_values = [
     ["AC", "+/-", "%", "÷"],
-    ["7", "8", "9", "×"],
-    ["4", "5", "6", "-"],
-    ["1", "2", "3", "+"],
-    ["0", ".", "√", "="],
+    ["(", ")", "√", "×"],
+    ["7", "8", "9", "-"],
+    ["4", "5", "6", "+"],
+    ["1", "2", "3", "="],
+    ["0", ".", " ", " "],
 ]
 
 #position des bouttons
@@ -16,8 +17,8 @@ bottom_symbols = ["√"]
 
 
 #nombre rangs et colonnes
-row_count = len(button_values) #5
-column_count = len(button_values[0])#4
+row_count = len(button_values) 
+column_count = len(button_values[0])
 
 
 color_1 = "#D4D4D2"
@@ -40,6 +41,19 @@ label.grid(row=0, column=0, columnspan=column_count, sticky="we")
 
 #Prio des signes
 def calculate_expression(expression):
+    #Gestion des parantheses
+    
+    while "(" in expression:
+        start = expression.rfind("(")
+        end = expression.find(")", start)
+
+        if end == -1: return "ERROR"
+        
+        sub_expr = expression[start + 1:end]
+        sub_result = calculate_expression(sub_expr)
+        expression = expression[:start] + str(sub_result) + expression[end + 1:]
+
+
     # Séparer les num et symbols en protégeant les nombres négatifs
     temp_expr = ""
     for i, char in enumerate(expression):
@@ -113,10 +127,17 @@ def clear_all():
 
 def remove_zero(num):
     if num == "ERROR": return "ERROR"
-    num = round(float(num),10)
-    if float(num) % 1 == 0 :
-        num = int(num)
-    return str(num)
+    try:
+        f_num = float(num)
+        if abs(f_num) > 9999999999 :
+            return "{:.5e}".format(f_num)
+        
+        if f_num % 1 == 0:
+            return str(int(f_num))
+        else:
+            return str(round(f_num, 8))
+    except:
+        return "ERROR"
 
 
 def button_clicked(value):
@@ -124,9 +145,13 @@ def button_clicked(value):
 
     if value in bottom_symbols:
         if value == "√":
-            result = float(label["text"]) ** 0.5
-            result = round(result, 4)
-            label["text"] = remove_zero(result)
+            val = float(label["text"])
+            if val < 0:
+                label["text"] = "ERROR"
+            else:
+                result = val** 0.5
+                result = round(result, 4)
+                label["text"] = remove_zero(result)
 
 
     if value in right_symbols:
@@ -163,10 +188,10 @@ def button_clicked(value):
     else:
         if value == ".":
             # On split pour vérifier le point sur le dernier nombre tapé
-            last_part = label["text"].replace("+"," ").replace("-"," ").replace("×"," ").replace("÷"," ").split()[-1]
+            last_part = label["text"].replace("+"," ").replace("-"," ").replace("×"," ").replace("÷"," ").replace("(", " ").replace("(", " ").split()[-1]
             if "." not in last_part:
                 label["text"] += value
-        elif value in "0123456789":
+        elif value in "0123456789()":
             if label["text"] == "0" or label["text"] == "ERROR":
                 label["text"] = value #remplace le 0
             else:
