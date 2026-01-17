@@ -4,6 +4,7 @@ import tkinter
 button_values = [
     ["AC", "+/-", "%", "÷"],
     ["(", ")", "√", "×"],
+    ["sin", "cos", "tan", "π"], 
     ["7", "8", "9", "-"],
     ["4", "5", "6", "+"],
     ["1", "2", "3", "="],
@@ -11,9 +12,9 @@ button_values = [
 ]
 
 #position des bouttons
-right_symbols = ["÷", "×", "-", "+", "="]
+right_symbols = ["÷", "×", "-", "+", "=", "π"]
 top_symbols = ["AC", "+/-", "%"]
-bottom_symbols = ["√"]
+bottom_symbols = ["√", "sin", "cos", "tan",]
 
 
 #nombre rangs et colonnes
@@ -31,13 +32,59 @@ color_5 = "white"
 window = tkinter.Tk() #creer la page
 window.title("Calculator")
 window.resizable(False, False)
+window.configure(background=color_2)
 
-#affichage dans la page
-frame = tkinter.Frame(window)#integrer la frame dans window
+# --- STRUCTURE POUR HISTORIQUE ---
+main_wrapper = tkinter.Frame(window, background=color_2)
+main_wrapper.pack(padx=10, pady=10)
+
+frame = tkinter.Frame(main_wrapper, background=color_2)#integrer la frame dans main_wrapper
+frame.grid(row=0, column=0)
+
 label = tkinter.Label(frame, text="0", font=("Arial", 45), background=color_2,
                       foreground=color_5, anchor="e", width=column_count + 1)
 
 label.grid(row=0, column=0, columnspan=column_count, sticky="we")
+
+# --- SECTION HISTORIQUE ---
+history_frame = tkinter.Frame(main_wrapper, background=color_3, padx=10, pady=10)
+history_frame.grid(row=0, column=1, sticky="ns", padx=(10, 0))
+
+tkinter.Label(history_frame, text="HISTORIQUE", font=("Arial", 12, "bold"), 
+              background=color_3, foreground=color_5).pack()
+
+history_list = tkinter.Listbox(history_frame, width=20, height=15, font=("Arial", 10),
+                               background=color_2, foreground=color_5, borderwidth=0)
+history_list.pack(pady=5)
+
+def clear_history():
+    history_list.delete(0, tkinter.END)
+
+clear_hist_btn = tkinter.Button(history_frame, text="Effacer", command=clear_history,
+                                background=color_1, foreground=color_2, font=("Arial", 10))
+clear_hist_btn.pack(fill="x")
+
+# --- VALEUR DE PI ET FONCTIONS MAISON ---
+PI_VAL = 3.14
+
+def custom_sin(x):
+    # Conversion degrés en radians
+    x = (x % 360) * (PI_VAL / 180)
+    # Série de Taylor
+    res = x - (x**3)/6 + (x**5)/120 - (x**7)/5040 + (x**9)/362880
+    return round(res, 8)
+
+def custom_cos(x):
+    x = (x % 360) * (PI_VAL / 180)
+    # Série de Taylor
+    res = 1 - (x**2)/2 + (x**4)/24 - (x**6)/720 + (x**8)/40320
+    return round(res, 8)
+
+def custom_tan(x):
+    c = custom_cos(x)
+    if abs(c) < 0.0000001: return "ERROR"
+    return round(custom_sin(x) / c, 8)
+
 
 #Prio des signes
 def calculate_expression(expression):
@@ -103,8 +150,9 @@ def calculate_expression(expression):
 for row in range(row_count):
     for column in range(column_count):
         value = button_values[row][column]
-        button = tkinter.Button(frame, text=value, font=("Arial", 30),
-                                width=column_count-1, height=1,
+        if value == " ": continue
+        button = tkinter.Button(frame, text=value, font=("Arial", 25),
+                                width=column_count, height=1,
                                 command=lambda value=value: button_clicked(value))
         
         if value in top_symbols:
@@ -115,7 +163,6 @@ for row in range(row_count):
             button.config(foreground=color_5, background=color_3)
 
         button.grid(row=row+1, column=column)
-frame.pack()
 
 
 
@@ -144,21 +191,48 @@ def button_clicked(value):
     global right_symbols, top_symbols, label, A, B, operator
 
     if value in bottom_symbols:
-        if value == "√":
-            val = float(label["text"])
-            if val < 0:
-                label["text"] = "ERROR"
+        val_origin = label["text"]
+        
+        # Cas spécial pour PI
+        if value == "π":
+            if label["text"] == "0" or label["text"] == "ERROR":
+                label["text"] = str(PI_VAL)
             else:
-                result = val** 0.5
-                result = round(result, 4)
-                label["text"] = remove_zero(result)
+                # Si on a déjà un chiffre, on multiplie par défaut ou on ajoute
+                label["text"] += str(PI_VAL)
+            return
+
+        try:
+            val = float(val_origin)
+            res_str = ""
+            if value == "√":
+                if val < 0: res_str = "ERROR"
+                else: res_str = remove_zero(round(val**0.5, 4))
+            elif value == "sin":
+                res_str = remove_zero(custom_sin(val))
+            elif value == "cos":
+                res_str = remove_zero(custom_cos(val))
+            elif value == "tan":
+                res_str = remove_zero(custom_tan(val))
+            
+            if res_str != "ERROR":
+                history_list.insert(0, f"{value}({val_origin}) = {res_str}")
+            label["text"] = res_str
+        except: label["text"] = "ERROR"
 
 
     if value in right_symbols:
         if value == "=":
+            expr_origin = label["text"] # Sauvegarde avant calcul
             try:
-                final_result = calculate_expression(label["text"])
-                label["text"] = remove_zero(final_result)
+                final_result = calculate_expression(expr_origin)
+                res_str = remove_zero(final_result)
+                
+                # Ajout à l'historique
+                if res_str != "ERROR" and expr_origin != res_str:
+                    history_list.insert(0, f"{expr_origin} = {res_str}")
+                
+                label["text"] = res_str
                 clear_all()
             except:
                 label["text"] = "ERROR"
@@ -188,8 +262,9 @@ def button_clicked(value):
     else:
         if value == ".":
             # On split pour vérifier le point sur le dernier nombre tapé
-            last_part = label["text"].replace("+"," ").replace("-"," ").replace("×"," ").replace("÷"," ").replace("(", " ").replace("(", " ").split()[-1]
-            if "." not in last_part:
+            last_part = label["text"].replace("+"," ").replace("-"," ").replace("×"," ").replace("÷"," ").replace("(", " ").replace(")", " ").split()
+            if not last_part: last_part = ["0"]
+            if "." not in last_part[-1]:
                 label["text"] += value
         elif value in "0123456789()":
             if label["text"] == "0" or label["text"] == "ERROR":
