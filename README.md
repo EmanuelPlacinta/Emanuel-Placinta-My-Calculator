@@ -36,8 +36,8 @@ python calculator.py
 
 Opérations de base : Utilisez le pavé numérique et les opérateurs classiques (+, -, ×, ÷)
 ### Fonctions avancées :
-**: Élévation à la puissance
-√ : Calcul de la racine carrée du nombre affiché
+** : Élévation à la puissance
+√  : Calcul de la racine carrée du nombre affiché
 sin/cos/tan : Calcule la valeur trigonométrique du nombre actuel (en degrés)
 
 ### Gestion de l'affichage :
@@ -57,6 +57,7 @@ Ce projet a été réalisé avec succès par :
 * **Mayeul Rouberty**
 * **Michel Rostain**
 * **Yasmine SefSaf**
+
 
 
 
