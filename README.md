@@ -1,4 +1,4 @@
-# La calculatrice à Taylor
+# La calculatrice 
 
 Une calculatrice graphique complète et élégante développée en Python avec Tkinter. Ce projet va au-delà d'une simple interface en intégrant ses propres algorithmes de calcul trigonométrique basés sur les séries de Taylor et une gestion intelligente de l'historique
 
@@ -50,3 +50,4 @@ Les calculs s'ajoutent automatiquement à droite
 Utilisez le bouton Effacer sous la liste pour remettre l'historique à zéro
 
 ---
+
