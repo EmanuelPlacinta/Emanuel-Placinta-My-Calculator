@@ -40,12 +40,12 @@ Opérations de base : Utilisez le pavé numérique et les opérateurs classiques
 √ : Calcul de la racine carrée du nombre affiché
 sin/cos/tan : Calcule la valeur trigonométrique du nombre actuel (en degrés)
 
-###Gestion de l'affichage :
+### Gestion de l'affichage :
  AC : Efface l'écran et réinitialise les calculs en cours
  +/-: Bascule entre positif et négatif
  %: Divise la valeur actuelle par 100
 
-###Historique :
+### Historique :
 Les calculs s'ajoutent automatiquement à droite
 Utilisez le bouton Effacer sous la liste pour remettre l'historique à zéro
 
@@ -57,5 +57,6 @@ Ce projet a été réalisé avec succès par :
 * **Mayeul Rouberty**
 * **Michel Rostain**
 * **Yasmine SefSaf**
+
 
 
