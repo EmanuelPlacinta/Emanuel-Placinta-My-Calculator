@@ -36,18 +36,26 @@ python calculator.py
 
 Opérations de base : Utilisez le pavé numérique et les opérateurs classiques (+, -, ×, ÷)
 ### Fonctions avancées :
-* ** ** **: Élévation à la puissance
-* ** √ **: Calcul de la racine carrée du nombre affiché
-* ** **sin/cos/tan : Calcule la valeur trigonométrique du nombre actuel (en degrés)
+**: Élévation à la puissance
+√ : Calcul de la racine carrée du nombre affiché
+sin/cos/tan : Calcule la valeur trigonométrique du nombre actuel (en degrés)
 
 ###Gestion de l'affichage :
-* **AC **: Efface l'écran et réinitialise les calculs en cours
-* **+/- **: Bascule entre positif et négatif
-* **% **: Divise la valeur actuelle par 100
+ AC : Efface l'écran et réinitialise les calculs en cours
+ +/-: Bascule entre positif et négatif
+ %: Divise la valeur actuelle par 100
 
 ###Historique :
 Les calculs s'ajoutent automatiquement à droite
 Utilisez le bouton Effacer sous la liste pour remettre l'historique à zéro
 
 ---
+
+### Réalisation
+Ce projet a été réalisé avec succès par :
+* **Placinta Emanuel-Ioan**
+* **Mayeul Rouberty**
+* **Michel Rostain**
+* **Yasmine SefSaf**
+
 
