@@ -8,12 +8,12 @@ button_values = [
     ["7", "8", "9", "÷"],
     ["4", "5", "6", "**"],
     ["1", "2", "3", "="],
-    ["0", ".", " ", "π"],
+    ["0", ".","⌫", "π"],
 ]
 
 #position des bouttons
 right_symbols = ["**", "÷", "×", "-", "+", "=", "π"]
-top_symbols = ["AC", "+/-", "%"]
+top_symbols = ["AC", "+/-", "%", "⌫"]
 bottom_symbols = ["√", "sin", "cos", "tan"]
 
 
@@ -273,6 +273,15 @@ def button_clicked(value):
         elif value == "%":
             result = float(label["text"]) / 100
             label["text"] = remove_zero(result)
+
+        # Bouton de corrections d'erreur de saisie
+        elif value == "⌫":
+            current_text = label["text"]
+            # Si le texte a plus d'1 caractère et n'est pas une erreur
+            if len(current_text) > 1 and current_text != "ERROR":
+                label["text"] = current_text[:-1] # On garde tout sauf le dernier
+            else:
+                label["text"] = "0" # Sinon on revient à 0
     else:
         if value == ".":
             # On split pour vérifier le point sur le dernier nombre tapé
