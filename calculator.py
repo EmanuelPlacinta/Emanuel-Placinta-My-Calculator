@@ -2,18 +2,18 @@ import tkinter
 
 #setup calculatrice
 button_values = [
-    ["AC", "+/-", "%", "÷"],
-    ["(", ")", "√", "×"],
-    ["sin", "cos", "tan", "π"], 
-    ["7", "8", "9", "-"],
-    ["4", "5", "6", "+"],
+    ["AC", "+/-", "%", "+"],
+    ["(", ")", "√", "-"],
+    ["sin", "cos", "tan", "×"], 
+    ["7", "8", "9", "÷"],
+    ["4", "5", "6", "**"],
     ["1", "2", "3", "="],
-    ["0", ".", " ", "**"],
+    ["0", ".","⌫", "π"],
 ]
 
 #position des bouttons
 right_symbols = ["**", "÷", "×", "-", "+", "=", "π"]
-top_symbols = ["AC", "+/-", "%"]
+top_symbols = ["AC", "+/-", "%", "⌫"]
 bottom_symbols = ["√", "sin", "cos", "tan"]
 
 
@@ -27,6 +27,8 @@ color_2 = "#1C1C1C"
 color_3 = "#505050"
 color_4 = "#FF9500"
 color_5 = "white"
+
+is_result=False
 
 #setup page calculatrice
 window = tkinter.Tk() #creer la page
@@ -197,6 +199,7 @@ def remove_zero(num):
 
 def button_clicked(value):
     global right_symbols, top_symbols, label, A, B, operator
+    global is_result
 
     if value in bottom_symbols:
         val_origin = label["text"]
@@ -241,12 +244,14 @@ def button_clicked(value):
                     history_list.insert(0, f"{expr_origin} = {res_str}")
                 
                 label["text"] = res_str
+                is_result=True
                 clear_all()
             except:
-                label["text"] = "ERROR"
+                label["text"] = res_str
+                is_result = True  # On active le témoin : c'est un résultat
                 clear_all()
-
         elif value in "+-×÷**":
+            is_result = False
             if label["text"] == "ERROR":
                 label["text"] = "0"
 
@@ -257,6 +262,7 @@ def button_clicked(value):
 
     elif value in top_symbols:
         if value == "AC":
+            is_result = False
             clear_all()
             label["text"] = "0"
 
@@ -267,6 +273,15 @@ def button_clicked(value):
         elif value == "%":
             result = float(label["text"]) / 100
             label["text"] = remove_zero(result)
+
+        # Bouton de corrections d'erreur de saisie
+        elif value == "⌫":
+            current_text = label["text"]
+            # Si le texte a plus d'1 caractère et n'est pas une erreur
+            if len(current_text) > 1 and current_text != "ERROR":
+                label["text"] = current_text[:-1] # On garde tout sauf le dernier
+            else:
+                label["text"] = "0" # Sinon on revient à 0
     else:
         if value == ".":
             # On split pour vérifier le point sur le dernier nombre tapé
@@ -275,10 +290,14 @@ def button_clicked(value):
             if "." not in last_part[-1]:
                 label["text"] += value
         elif value in "0123456789()π":
-            if label["text"] == "0" or label["text"] == "ERROR":
-                label["text"] = value #remplace le 0
+            # Si c'est un résultat, on efface tout et on écrit le nouveau chiffre
+            if is_result:
+                label["text"] = value
+                is_result = False # On désactive le témoin pour la suite
+            elif label["text"] == "0" or label["text"] == "ERROR":
+                label["text"] = value
             else:
-                label["text"] += value #ajoute chiffre
+                label["text"] += value
 
 #centrer la calculatrice
 window.update()
