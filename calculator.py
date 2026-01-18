@@ -117,14 +117,14 @@ def calculate_expression(expression):
     i = 0
     while i < len(elements):
 
-        if elements[i] in ["**"]:
-            num1 = float(elements[i-1])
-            num2 = float(elements[i+1])
-            res= num1 ** num2
-            elements[i-1:i+2]=[res]
-            i-=1
-      
-        if elements[i] in ["×", "÷"]:
+        if elements[i] == "**": # Utilise == car c'est un seul symbole
+                    num1 = float(elements[i-1])
+                    num2 = float(elements[i+1])
+                    res = num1 ** num2
+                    elements[i-1:i+2] = [res]
+
+                    i -= 1      
+        elif elements[i] in ["×", "÷"]:
             num1 = float(elements[i-1])
             num2 = float(elements[i+1])
             if elements[i] == "×" :
@@ -176,6 +176,8 @@ def clear_all():
     operator = None
     B = None
 
+
+# Nettoyage et formatage du texte
 def remove_zero(num):
     if num == "ERROR": return "ERROR"
 
@@ -184,6 +186,7 @@ def remove_zero(num):
         if abs(f_num) > 9999999999 :
             return "{:.5e}".format(f_num)
         
+        # Vérifie que c'est un entier
         if f_num % 1 == 0:
             return str(int(f_num))
         else:
@@ -243,7 +246,7 @@ def button_clicked(value):
                 label["text"] = "ERROR"
                 clear_all()
 
-        elif value in "+-×÷":
+        elif value in "+-×÷**":
             if label["text"] == "ERROR":
                 label["text"] = "0"
 
