@@ -8,13 +8,13 @@ button_values = [
     ["7", "8", "9", "-"],
     ["4", "5", "6", "+"],
     ["1", "2", "3", "="],
-    ["0", ".", " ", " "],
+    ["0", ".", " ", "**"],
 ]
 
 #position des bouttons
-right_symbols = ["÷", "×", "-", "+", "=", "π"]
+right_symbols = ["**", "÷", "×", "-", "+", "="]
 top_symbols = ["AC", "+/-", "%"]
-bottom_symbols = ["√", "sin", "cos", "tan",]
+bottom_symbols = ["√", "sin", "cos", "tan", "π"]
 
 
 #nombre rangs et colonnes
@@ -102,24 +102,28 @@ def calculate_expression(expression):
 
 
     # Séparer les num et symbols en protégeant les nombres négatifs
-    temp_expr = ""
-    for i, char in enumerate(expression):
-        if char in "+×÷":
-            temp_expr += f" {char} "
-        elif char == "-":
-            # Si le moins est au début ou après un autre opérateur, c'est un nombre négatif
-            if i == 0 or expression[i-1] in "+-×÷":
-                temp_expr += char
-            else:
-                temp_expr += " - "
-        else:
-            temp_expr += char
+    temp_expr = expression.replace("**", " ** ").replace("×", " × ").replace("÷", " ÷ ").replace("+", " + ")
             
-    elements = temp_expr.split()
+    elements = []
+    for part in temp_expr.split():
+            if "-" in part and len(part) > 1: 
+                elements.append(part)
+            elif "-" in part: 
+                elements.append("-")
+            else:
+                elements.append(part)
 
     # mettre la prio sur la div et la multiplication
     i = 0
     while i < len(elements):
+
+        if elements[i] in ["**"]:
+            num1 = float(elements[i-1])
+            num2 = float(elements[i+1])
+            res= num1 ** num2
+            elements[i-1:i+2]=[res]
+            i-=1
+      
         if elements[i] in ["×", "÷"]:
             num1 = float(elements[i-1])
             num2 = float(elements[i+1])
@@ -174,6 +178,7 @@ def clear_all():
 
 def remove_zero(num):
     if num == "ERROR": return "ERROR"
+
     try:
         f_num = float(num)
         if abs(f_num) > 9999999999 :
@@ -242,7 +247,7 @@ def button_clicked(value):
             if label["text"] == "ERROR":
                 label["text"] = "0"
 
-            if label["text"][-1] in "+-×÷":
+            if label["text"][-1] in "+-×÷**":
                 label["text"] = label["text"][:-1] + value
             else:
                 label["text"] += value
@@ -266,7 +271,7 @@ def button_clicked(value):
             if not last_part: last_part = ["0"]
             if "." not in last_part[-1]:
                 label["text"] += value
-        elif value in "0123456789()":
+        elif value in "0123456789()π":
             if label["text"] == "0" or label["text"] == "ERROR":
                 label["text"] = value #remplace le 0
             else:
